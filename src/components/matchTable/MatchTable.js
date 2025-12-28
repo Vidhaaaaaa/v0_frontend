@@ -4,6 +4,16 @@ import { endpoints } from '@/store/urls';
 import stl from './MatchTable.module.scss';
 import toast from 'react-hot-toast';
 
+const OUTCOME_LABELS = {
+  walkover: 'Walkover',
+};
+// FUTURE
+// forfeit: 'Forfeit',
+// bye: 'Bye',
+
+const getOutcomeLabel = (outcome) =>
+  OUTCOME_LABELS[outcome] || outcome;
+
 const MatchTable = ({ tournamentId }) => {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -42,7 +52,8 @@ const MatchTable = ({ tournamentId }) => {
         'Team 1',
         'Team 2',
         'Result',
-        'Status'
+        'Status',
+        'Outcome'
       ];
 
       // Convert matches to CSV rows
@@ -53,7 +64,8 @@ const MatchTable = ({ tournamentId }) => {
         match.team1_players,
         match.team2_players,
         match.match_result,
-        match.match_status.status
+        match.match_status.status,
+        match.match_outcome
       ]);
 
       // Combine headers and rows
@@ -100,6 +112,7 @@ const MatchTable = ({ tournamentId }) => {
               <th>Team 2</th>
               <th>Result</th>
               <th>Status</th>
+              <th>Outcome</th>
             </tr>
           </thead>
           <tbody>
@@ -110,11 +123,26 @@ const MatchTable = ({ tournamentId }) => {
                 <td>{match.pool || '-'}</td>
                 <td>{match.team1_players}</td>
                 <td>{match.team2_players}</td>
-                <td>{match.match_result}</td>
+
+                {/* Result */}
+                <td>
+                  {match.match_outcome && match.match_outcome !== 'normal'
+                    ? <strong>{getOutcomeLabel(match.match_outcome)}</strong>
+                    : match.match_result}
+                </td>
+
+                {/* Status */}
                 <td>
                   <span className={`${stl.status} ${stl[match.match_status.status]}`}>
                     {match.match_status.status}
                   </span>
+                </td>
+
+                {/* Outcome */}
+                <td>
+                  {match.match_outcome && match.match_outcome !== 'normal'
+                    ? getOutcomeLabel(match.match_outcome)
+                    : '-'}
                 </td>
               </tr>
             ))}
